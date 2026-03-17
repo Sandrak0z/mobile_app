@@ -21,12 +21,29 @@ const styles = StyleSheet.create({
     borderColor: '#d0d0d0',
     borderWidth: 1, 
     alignItems: 'center'
+    
   },
   image: {
     width: '95%',
     height: 120, 
   },
   
+  info: {
+    marginTop: 10, 
+    alignItems: 'center', 
+    width: '100%',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  price: {
+    color: '#236b41',
+    fontWeight: 'bold',
+    marginTop: 5,
+  }
+
 });
 
 export default ProductCard;
