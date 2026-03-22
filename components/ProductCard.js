@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import {useNavigation } from '@react-navigation/native';
 
-const ProductCard = ({ foto, titel, prijs, onPress, description}) => { 
+const ProductCard = ({ foto, titel, prijs, onPress, inhoud, omschrijving}) => { 
   const navigation = useNavigation();
 
   return (
@@ -11,7 +11,8 @@ const ProductCard = ({ foto, titel, prijs, onPress, description}) => {
       
       <View style={styles.info}>
         <Text style={styles.title}>{titel}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.omschrijving}>{omschrijving}</Text>
+        <Text style={styles.inhoud}>{inhoud}</Text>
         <Text style={styles.price}>€ {prijs}</Text>
         
         <TouchableOpacity 
@@ -19,7 +20,8 @@ const ProductCard = ({ foto, titel, prijs, onPress, description}) => {
             titel: titel, 
             prijs: prijs, 
             foto: foto,
-            description: description
+            inhoud: inhoud,
+            omschrijving: omschrijving
           })}
         >
           <Text style={styles.link}>Bekijk details</Text>
@@ -53,10 +55,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  description: {
+  inhoud: {
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+    paddingHorizontal: 5,
+  },
+  omschrijving: {
+    fontSize: 13,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 5,
     paddingHorizontal: 5,
   },
   price: {

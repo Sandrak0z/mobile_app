@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TextInput, Switch, TouchableOpacity, Alert} from 'react-native';
 import ProductCard from '../components/ProductCard';
+import BlogCard from '../components/BlogCard';
 
 const HomeScreen = ({navigation}) => { 
   const [onlyPromos, setOnlyPromos] = useState(false);
@@ -9,7 +10,7 @@ const HomeScreen = ({navigation}) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.header}>Mijn Producten</Text>
+        <Text style={styles.header}>Artikellen</Text>
       
         <TextInput 
           style={styles.searchBar} 
@@ -30,13 +31,14 @@ const HomeScreen = ({navigation}) => {
         <ProductCard 
           titel="Vlekkenreinger Witte Was" 
           prijs="10" 
-          foto="https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg" 
+          foto="https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg"
+          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."  
           onPress={() =>
             Navigation.navigate("ProductDetails", {
               titel: "Vlekkenreinger Witte Was",
               prijs: "10",
               foto: ("https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg"),
-              description: "Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was. Verwijdert hardnekkige vlekken en houdt je witte kleding stralend schoon."
+              inhoud: "Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was. Verwijdert hardnekkige vlekken en houdt je witte kleding stralend schoon."
             })
           }
         />
@@ -51,6 +53,16 @@ const HomeScreen = ({navigation}) => {
           titel="Shea Lichaamszeep" 
           prijs="8" 
           foto="https://www.kudzu.be/media/large2x_69a954c324a70_Afbeelding.jpeg" 
+        />
+
+
+        <Text style={styles.header}> Blogposts</Text>
+
+          <BlogCard 
+          titel="Duurzaam Leven" beschrijving="5 tips voor een groener huis."
+          foto="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500"
+          omschrijving="In deze blog delen we 5 praktische tips om je huis groener en duurzamer te maken. Van energie besparen tot het verminderen van afval, ontdek hoe je een positieve impact kunt hebben op het milieu terwijl je ook nog eens geld bespaart!"
+          onPress={() => navigation.navigate('BlogDetails', { titel: "Duurzaam Leven", inhoud: "Volledige blog tekst hier...", foto: "...", type: 'blog' })}
         />
 
     
@@ -69,6 +81,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#f5f5f5', 
   },
+  
   content: { 
     padding: 20, 
     flexDirection: 'row',
