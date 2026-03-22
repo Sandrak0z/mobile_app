@@ -12,8 +12,8 @@ const ProductCard = ({ foto, titel, prijs, onPress, inhoud, omschrijving}) => {
       <View style={styles.info}>
         <Text style={styles.title}>{titel}</Text>
         <Text style={styles.omschrijving}>{omschrijving}</Text>
-        <Text style={styles.inhoud}>{inhoud}</Text>
         <Text style={styles.price}>€ {prijs}</Text>
+
         
         <TouchableOpacity 
           onPress={() => navigation.navigate('ProductDetails', { 
@@ -22,6 +22,7 @@ const ProductCard = ({ foto, titel, prijs, onPress, inhoud, omschrijving}) => {
             foto: foto,
             inhoud: inhoud,
             omschrijving: omschrijving
+
           })}
         >
           <Text style={styles.link}>Bekijk details</Text>

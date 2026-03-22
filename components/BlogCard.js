@@ -5,15 +5,18 @@ import {useNavigation } from '@react-navigation/native';
 const BlogCard = ({ foto, titel, inhoud, omschrijving, onPress }) => {
   const navigation = useNavigation(); 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+      <View style={styles.card}>      
       <Image source={{ uri: foto }} style={styles.image} />
       <View style={styles.info}>
         <Text style={styles.title}>{titel}</Text>
-        <Text style={styles.inhoud}>{inhoud}</Text>
         <Text style={styles.omschrijving}>{omschrijving}</Text>
-        <Text style={styles.link}>Lees meer →</Text>
+
+   <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BlogDetails', { titel, inhoud, foto })}>
+          <Text style={styles.link}>Lees meer →</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
+
   );
 };
 

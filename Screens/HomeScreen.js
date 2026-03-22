@@ -27,26 +27,33 @@ const HomeScreen = ({ navigation }) => {
             value={onlyPromos}
           />
         </View>
+        
+
+
 
         <ProductCard 
           titel="Vlekkenreinger Witte Was" 
           prijs="10" 
           foto="https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg"
-          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."  
-          onPress={() =>
-            navigation.navigate("ProductDetails", {
-              titel: "Vlekkenreinger Witte Was",
-              prijs: "10",
-              foto: "https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg",
-              inhoud: "Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was."
-            })
-          }
+          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."
+          inhoud={"Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was."}
         />
         
         <ProductCard 
           titel="Silicone Sandwich Bag" 
           prijs="11" 
           foto="https://www.kudzu.be/media/large2x_68da6aa626a82_Afbeelding%20155.jpeg" 
+          omschrijving="Herbruikbare zakjes voor voedselopslag, perfect voor onderweg."
+          inhoud={"Deze herbruikbare zakjes zijn ideaal voor voedselopslag en zijn perfect voor onderweg."}
+
+        />
+
+        <ProductCard 
+          titel="Vlekkenreinger Witte Was" 
+          prijs="10" 
+          foto="https://www.kudzu.be/media/large2x_670967dc770cd_05419980270221_a1c1_20240801.jpg"
+          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."  
+          inhoud={"Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was."}
         />
 
         <Text style={styles.header}>Blogposts</Text>
@@ -55,11 +62,15 @@ const HomeScreen = ({ navigation }) => {
           titel="Duurzaam Leven" 
           foto="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500"
           omschrijving="5 praktische tips om je huis groener te maken."
-          onPress={() => navigation.navigate('BlogDetails', { 
-            titel: "Duurzaam Leven", 
-            inhoud: "Volledige blog tekst hier...", 
-            foto: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500" 
-          })}
+          inhoud={"Duurzaam leven hoeft niet ingewikkeld of duur te zijn. Het begint allemaal bij de kleine keuzes die we dagelijks maken. Hier zijn 5 simpele tips om vandaag nog te beginnen: Zeg nee tegen wegwerpplastic: Neem altijd je eigen herbruikbare tas en waterfles mee. Kleine moeite, groot verschil voor de oceaan! Kies voor natuurlijke schoonmaakmiddelen: Wist je dat je met azijn, baking soda en citroen bijna je hele huis kunt poetsen? Beter voor jou én het milieu. Eet meer lokaal en seizoensgebonden: Groenten en fruit die niet de hele wereld over hoeven te vliegen, smaken beter en hebben een lagere CO2-voetafdruk. Was op lage temperaturen: De meeste kleding wordt prima schoon op 30 graden. Dit bespaart enorm veel energie en je kleding gaat langer mee. Kies voor kwaliteit boven kwantiteit: Investeer in producten die lang meegaan in plaats van goedkope 'fast fashion' of wegwerpartikelen"}
+       
+        />
+
+        <BlogCard
+          titel="Zero Waste Lifestyle"
+          foto="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500"
+          omschrijving="Hoe je afval kunt verminderen in je dagelijks leven."
+          inhoud={"Veel mensen denken dat je je hele leven moet omgooien om duurzaam te zijn, maar niets is minder waar. Het geheim zit in de herhaling van kleine acties. Kies voor herasbaar: Vervang je plastic flesje door een stijlvolle RVS drinkbus. Het bespaart je geld en vermindert de plasticsoep. Was op 30 graden: De moderne wasmachines en wasmiddelen krijgen je kleding perfect schoon op lage temperaturen. Dit is beter voor je energierekening én je kleding gaat langer mee. Eet vaker plantaardig: Je hoeft geen fulltime veganist te worden, maar één dag per week geen vlees eten bespaart al duizenden liters water. Natuurlijke schoonmaak: Gebruik vaker natuurlijke zepen, zoals de Shea Lichaamszeep uit onze winkel, in plaats van agressieve chemische middelen. Koop bewust: Vraag jezelf bij elke aankoop af: 'Heb ik dit echt nodig?' Kwaliteit boven kwantiteit is de basis van een groene lifestyle."}
         />
 
         <TouchableOpacity style={styles.customButton} onPress={() => alert('Winkelmandje geopend!')}>

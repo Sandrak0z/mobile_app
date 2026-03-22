@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity,} from 'react-native';
 
 const ProductDetails = ({ route }) => { 
-  const { titel, prijs, foto } = route.params;
+  const { titel, prijs, foto, inhoud } = route.params;
 
   const [quantity, setQuantity] = useState(1);
   const incrementQuantity = () => setQuantity(quantity + 1);
@@ -17,7 +17,7 @@ const ProductDetails = ({ route }) => {
       <View style={styles.content}>
         <Text style={styles.header}>{titel}</Text>
         <Text style={styles.price}>€ {prijs}</Text>
-        <Text style={styles.description}> productbeschrijving...</Text>
+        <Text style={styles.inhoud}>{inhoud}</Text>
       </View>
       <View style={styles.content}>
 
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   header: { fontSize: 24, fontWeight: 'bold' },
   price: { fontSize: 20, color: '#236b41', marginVertical: 10 },
-  description: { fontSize: 16, color: '#666', lineHeight: 24 }
+  inhoud: { fontSize: 16, color: '#666', lineHeight: 24 }
 });
 
 export default ProductDetails;
