@@ -1,12 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, TextInput, Switch, TouchableOpacity, Alert } from 'react-native';
 import ProductCard from '../components/ProductCard';
 import BlogCard from '../components/BlogCard';
+import { Picker } from '@react-native-picker/picker';
 
-
+const categoryNames = {
+  "" : "Alle categorieën",
+  "69a5511b569e51eecf37b6ab" : "Beauty & Verzorging",
+  "69a5511b569e51eecf37b6a9" : "Huis & Tuin",
+  "69a5511b569e51eecf37b6a7" : "Kledij & Tassen",
+  "69a5511b569e51eecf37b6a5" : "Koken",
+}
 const HomeScreen = ({ navigation }) => { 
   const [onlyPromos, setOnlyPromos] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+
+  useEffect(() => {
+    fetch('https://api.webflow.com/v2/sites/698c7fc6053edea54bf62f29/products', {
+      headers: { 
+        'Authorization': 'Bearer 0e32ebd2af532b8a16135c44039a81a15c7c702d731e058aaeac322ede2a7165',
+  'Content-Type': 'application/json'
+}
+ })
+.then((res) => res.json())
+.then(data => {
+  setProducts(
+    data.items.map(item => {
+      const skuData = item.skus[0]?.fieldData || {};
+      
+      return {
+        id: item.product.id,
+          titel: item.product.fieldData.name,
+          prijs: (item.skus[0]?.fieldData.prijs?.value || 0) / 100,
+          omschrijving: item.product.fieldData.description,
+          Image: { uri: item.skus[0]?.fieldData["mainImage"]?.url },
+          category: categoryNames[item.product.fieldData.category] || "Onbekende categorie",
+          foto: skuData.mainImage?.url || skuData['main-image']?.url || "https://via.placeholder.com/150", 
+      };
+    })
+  );
+}).catch(error => console.error('Error fetching products:', error));
+  }, []);
+      
+   
+  const filteredProducts = selectedCategory
+    ? products.filter(product => product.category === categoryNames[selectedCategory])
+    : products;
+
+
 
   return (
     <ScrollView style={styles.container}>
@@ -16,6 +61,8 @@ const HomeScreen = ({ navigation }) => {
         <TextInput 
           style={styles.searchBar} 
           placeholder="Zoek een product..." 
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
 
         <View style={styles.switchContainer}>
@@ -27,10 +74,31 @@ const HomeScreen = ({ navigation }) => {
             value={onlyPromos}
           />
         </View>
+        <Picker
+          selectedValue={selectedCategory}
+          onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+          style={{ height: 50, width: '100%', marginBottom: 20 }}>
+          <Picker.Item label="Alle categorieën" value="" />
+          <Picker.Item label="Beauty & Verzorging" value="69a5511b569e51eecf37b6ab" />
+          <Picker.Item label="Huis & Tuin" value="69a5511b569e51eecf37b6a9" />
+          <Picker.Item label="Kledij & Tassen" value="69a5511b569e51eecf37b6a7" />
+          <Picker.Item label="Koken" value="69a5511b569e51eecf37b6a5" />
+            
+          </Picker>
         
         
 
-
+        {filteredProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            titel={product.titel}
+            prijs={product.prijs}
+            foto={product.foto}
+            omschrijving={product.omschrijving}
+            inhoud={product.inhoud}
+            onPress={() => navigation.navigate('ProductDetails',product)} 
+          />
+        ))}
 
         <ProductCard 
           titel="Vlekkenreinger Witte Was" 

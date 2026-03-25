@@ -35,7 +35,6 @@ const ProductCard = ({ foto, titel, prijs, onPress, inhoud, omschrijving}) => {
 const styles = StyleSheet.create({
   card: {
     width: '45%', 
-    height: "auto",
     marginBottom: 15,
     marginTop: 15,
     borderColor: '#d0d0d0',
