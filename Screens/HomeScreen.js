@@ -46,11 +46,19 @@ const HomeScreen = ({ navigation }) => {
 }).catch(error => console.error('Error fetching products:', error));
   }, []);
       
-   
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category === categoryNames[selectedCategory])
-    : products;
+  const filteredProducts = products.filter((product) => {
+  const productNaam = product.titel.toLowerCase();
+  const zoekTerm = searchQuery.toLowerCase();
 
+  if (selectedCategory !== "") {
+    const juisteCategorie = product.category === categoryNames[selectedCategory];
+    const naamMatch = productNaam.includes(zoekTerm);
+    
+    return juisteCategorie && naamMatch;
+  } else {
+    return productNaam.includes(zoekTerm);
+  }
+});
 
 
   return (
