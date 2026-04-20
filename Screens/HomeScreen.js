@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TextInput, Switch, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, Switch, TouchableOpacity } from 'react-native';
 import ProductCard from '../components/ProductCard';
 import BlogCard from '../components/BlogCard';
 import { Picker } from '@react-native-picker/picker';
@@ -12,59 +12,59 @@ const categoryNames = {
   "69a5511b569e51eecf37b6a7" : "Kledij & Tassen",
   "69a5511b569e51eecf37b6a5" : "Koken",
 }
+
 const HomeScreen = ({ navigation }) => { 
+  const [sortBy, setSortBy] = useState("naam-az");
   const [onlyPromos, setOnlyPromos] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-
   useEffect(() => {
     fetch('https://api.webflow.com/v2/sites/698c7fc6053edea54bf62f29/products', {
       headers: { 
         'Authorization': 'Bearer 0e32ebd2af532b8a16135c44039a81a15c7c702d731e058aaeac322ede2a7165',
-  'Content-Type': 'application/json'
-}
- })
-.then((res) => res.json())
-.then(data => {
-  setProducts(
-    data.items.map(item => {
-      const skuData = item.skus[0]?.fieldData || {};
-      
-      return {
-        id: item.product.id,
-          titel: item.product.fieldData.name,
-          prijs: (item.skus[0]?.fieldData.prijs?.value || 0) / 100,
-          omschrijving: item.product.fieldData.description,
-          Image: { uri: item.skus[0]?.fieldData["mainImage"]?.url },
-          category: categoryNames[item.product.fieldData.category] || "Onbekende categorie",
-          foto: skuData.mainImage?.url || skuData['main-image']?.url || "https://via.placeholder.com/150", 
-      };
+        'Content-Type': 'application/json'
+      }
     })
-  );
-}).catch(error => console.error('Error fetching products:', error));
+    .then((res) => res.json())
+    .then(data => {
+      setProducts(
+        data.items.map(item => {
+          const skuData = item.skus[0]?.fieldData || {};
+          return {
+            id: item.product.id,
+            titel: item.product.fieldData.name,
+            prijs: (item.skus[0]?.fieldData.prijs?.value || 0) / 100,
+            omschrijving: item.product.fieldData.description,
+            category: categoryNames[item.product.fieldData.category] || "Onbekende categorie",
+            foto: skuData.mainImage?.url || skuData['main-image']?.url || "https://via.placeholder.com/150", 
+          };
+        })
+      );
+    }).catch(error => console.error('Error fetching products:', error));
   }, []);
       
   const filteredProducts = products.filter((product) => {
-  const productNaam = product.titel.toLowerCase();
-  const zoekTerm = searchQuery.toLowerCase();
+    const productNaam = product.titel.toLowerCase();
+    const zoekTerm = searchQuery.toLowerCase();
+    const matchesCategory = selectedCategory === "" || product.category === categoryNames[selectedCategory];
+    const matchesSearch = productNaam.includes(zoekTerm);
+    const promoMatch = onlyPromos ? product.prijs < 15 : true;
 
-  if (selectedCategory !== "") {
-    const juisteCategorie = product.category === categoryNames[selectedCategory];
-    const naamMatch = productNaam.includes(zoekTerm);
-    
-    return juisteCategorie && naamMatch;
-  } else {
-    return productNaam.includes(zoekTerm);
-  }
-});
-
+    return matchesCategory && matchesSearch && promoMatch;
+  }).sort((a, b) => {
+    if (sortBy === "prijs-laag") return a.prijs - b.prijs;
+    if (sortBy === "prijs-hoog") return b.prijs - a.prijs;
+    if (sortBy === "naam-az") return a.titel.localeCompare(b.titel);
+    if (sortBy === "naam-za") return b.titel.localeCompare(a.titel);
+    return 0;
+  });
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.header}>Artikellen</Text>
+        <Text style={styles.header}>Artikelen</Text>
       
         <TextInput 
           style={styles.searchBar} 
@@ -72,6 +72,35 @@ const HomeScreen = ({ navigation }) => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
+        <View style={styles.dropdownRow}>
+          <View style={styles.pickerContainer}>
+          <Text style={styles.miniLabel}>Categorie</Text>
+          <Picker
+          selectedValue={selectedCategory}
+          onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+          style={styles.picker}>
+          <Picker.Item label="Alle categorieën" value="" />
+          <Picker.Item label="Beauty & Verzorging" value="69a5511b569e51eecf37b6ab" />
+          <Picker.Item label="Huis & Tuin" value="69a5511b569e51eecf37b6a9" />
+          <Picker.Item label="Kledij & Tassen" value="69a5511b569e51eecf37b6a7" />
+          <Picker.Item label="Koken" value="69a5511b569e51eecf37b6a5" /> 
+          </Picker></View>
+  
+
+          <View style={styles.pickerContainer}>
+            <Text style={styles.miniLabel}>Sorteer op</Text>
+            <Picker
+              selectedValue={sortBy}
+              onValueChange={(itemValue) => setSortBy(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="A-Z" value="naam-az" />
+              <Picker.Item label="Z-A" value="naam-za" />
+              <Picker.Item label="Prijs van laag naar hoog" value="prijs-laag" />
+              <Picker.Item label="Prijs van hoog naar laag" value="prijs-hoog" />
+            </Picker>
+          </View>
+        </View>
 
         <View style={styles.switchContainer}>
           <Text style={styles.switchText}>Alleen promoties tonen</Text>
@@ -82,78 +111,31 @@ const HomeScreen = ({ navigation }) => {
             value={onlyPromos}
           />
         </View>
-        <Picker
-          selectedValue={selectedCategory}
-          onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-          style={{ height: 50, width: '100%', marginBottom: 20 }}>
-          <Picker.Item label="Alle categorieën" value="" />
-          <Picker.Item label="Beauty & Verzorging" value="69a5511b569e51eecf37b6ab" />
-          <Picker.Item label="Huis & Tuin" value="69a5511b569e51eecf37b6a9" />
-          <Picker.Item label="Kledij & Tassen" value="69a5511b569e51eecf37b6a7" />
-          <Picker.Item label="Koken" value="69a5511b569e51eecf37b6a5" />
-            
-          </Picker>
-        
-        
 
-        {filteredProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            titel={product.titel}
-            prijs={product.prijs}
-            foto={product.foto}
-            omschrijving={product.omschrijving}
-            inhoud={product.inhoud}
-            onPress={() => navigation.navigate('ProductDetails',product)} 
-          />
-        ))}
-
-        <ProductCard 
-          titel="Vlekkenreinger Witte Was" 
-          prijs="10" 
-          foto="https://www.kudzu.be/media/large2x_688b7f6cc8f9a_Afbeelding%20312.jpeg"
-          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."
-          inhoud={"Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was."}
-        />
-        
-        <ProductCard 
-          titel="Silicone Sandwich Bag" 
-          prijs="11" 
-          foto="https://www.kudzu.be/media/large2x_68da6aa626a82_Afbeelding%20155.jpeg" 
-          omschrijving="Herbruikbare zakjes voor voedselopslag, perfect voor onderweg."
-          inhoud={"Deze herbruikbare zakjes zijn ideaal voor voedselopslag en zijn perfect voor onderweg."}
-
-        />
-
-        <ProductCard 
-          titel="Vlekkenreinger Witte Was" 
-          prijs="10" 
-          foto="https://www.kudzu.be/media/large2x_670967dc770cd_05419980270221_a1c1_20240801.jpg"
-          omschrijving="Verwijdert vlekken en houdt je witte kleding stralend."  
-          inhoud={"Deze krachtige vlekkenreiniger is speciaal ontwikkeld voor witte was."}
-        />
+        <View style={styles.productGrid}>
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              titel={product.titel}
+              prijs={product.prijs}
+              foto={product.foto}
+              omschrijving={product.omschrijving}
+              inhoud={product.inhoud}
+              onPress={() => navigation.navigate('ProductDetails', product)} 
+            />
+          ))}
+        </View>
 
         <Text style={styles.header}>Blogposts</Text>
-
         <BlogCard 
           titel="Duurzaam Leven" 
           foto="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500"
           omschrijving="5 praktische tips om je huis groener te maken."
-          inhoud={"Duurzaam leven hoeft niet ingewikkeld of duur te zijn. Het begint allemaal bij de kleine keuzes die we dagelijks maken. Hier zijn 5 simpele tips om vandaag nog te beginnen: Zeg nee tegen wegwerpplastic: Neem altijd je eigen herbruikbare tas en waterfles mee. Kleine moeite, groot verschil voor de oceaan! Kies voor natuurlijke schoonmaakmiddelen: Wist je dat je met azijn, baking soda en citroen bijna je hele huis kunt poetsen? Beter voor jou én het milieu. Eet meer lokaal en seizoensgebonden: Groenten en fruit die niet de hele wereld over hoeven te vliegen, smaken beter en hebben een lagere CO2-voetafdruk. Was op lage temperaturen: De meeste kleding wordt prima schoon op 30 graden. Dit bespaart enorm veel energie en je kleding gaat langer mee. Kies voor kwaliteit boven kwantiteit: Investeer in producten die lang meegaan in plaats van goedkope 'fast fashion' of wegwerpartikelen"}
-       
-        />
-
-        <BlogCard
-          titel="Zero Waste Lifestyle"
-          foto="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500"
-          omschrijving="Hoe je afval kunt verminderen in je dagelijks leven."
-          inhoud={"Veel mensen denken dat je je hele leven moet omgooien om duurzaam te zijn, maar niets is minder waar. Het geheim zit in de herhaling van kleine acties. Kies voor herasbaar: Vervang je plastic flesje door een stijlvolle RVS drinkbus. Het bespaart je geld en vermindert de plasticsoep. Was op 30 graden: De moderne wasmachines en wasmiddelen krijgen je kleding perfect schoon op lage temperaturen. Dit is beter voor je energierekening én je kleding gaat langer mee. Eet vaker plantaardig: Je hoeft geen fulltime veganist te worden, maar één dag per week geen vlees eten bespaart al duizenden liters water. Natuurlijke schoonmaak: Gebruik vaker natuurlijke zepen, zoals de Shea Lichaamszeep uit onze winkel, in plaats van agressieve chemische middelen. Koop bewust: Vraag jezelf bij elke aankoop af: 'Heb ik dit echt nodig?' Kwaliteit boven kwantiteit is de basis van een groene lifestyle."}
         />
 
         <TouchableOpacity style={styles.customButton} onPress={() => alert('Winkelmandje geopend!')}>
           <Text style={styles.buttonText}>Winkelmandje Bekijken</Text>
         </TouchableOpacity>
-
       </View>
       <StatusBar style="auto" />
     </ScrollView>
@@ -162,12 +144,19 @@ const HomeScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  content: { padding: 20, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 15 },
-  header: { fontSize: 26, fontWeight: 'bold', marginBottom: 20, marginTop: 20, width: '100%', color: '#333' },
+  content: { padding: 15 },
+  header: { fontSize: 26, fontWeight: 'bold', marginBottom: 20, marginTop: 20, color: '#333' },
   searchBar: { width: '100%', height: 50, backgroundColor: '#ffffff', borderRadius: 12, paddingHorizontal: 15, marginBottom: 15, borderWidth: 1, borderColor: '#ddd', fontSize: 16 },
+  
+  dropdownRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
+  pickerContainer: { flex: 0.48, backgroundColor: '#ffffff', borderRadius: 12, borderWidth: 1, borderColor: '#ddd', padding: 5 },
+  miniLabel: { fontSize: 10, color: '#888', fontWeight: 'bold', marginLeft: 10, textTransform: 'uppercase' },
+  picker: { height: 50, width: '100%' },
+
   switchContainer: { width: '100%', height: 55, backgroundColor: '#ffffff', borderRadius: 12, paddingHorizontal: 15, marginBottom: 20, borderWidth: 1, borderColor: '#ddd', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   switchText: { fontSize: 16, color: '#555' },
-  customButton: { width: '100%', backgroundColor: '#236b41', paddingVertical: 15, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
+  productGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%' },
+  customButton: { width: '100%', backgroundColor: '#236b41', paddingVertical: 15, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginTop: 20, marginBottom: 40 },
   buttonText: { color: '#ffffff', fontSize: 18, fontWeight: 'bold' }
 });
 
