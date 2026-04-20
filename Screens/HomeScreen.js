@@ -19,6 +19,7 @@ const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
     fetch('https://api.webflow.com/v2/sites/698c7fc6053edea54bf62f29/products', {
@@ -27,7 +28,8 @@ const HomeScreen = ({ navigation }) => {
         'Content-Type': 'application/json'
       }
     })
-    .then((res) => res.json())
+        .then((res) => res.json())
+
     .then(data => {
       setProducts(
         data.items.map(item => {
@@ -35,15 +37,34 @@ const HomeScreen = ({ navigation }) => {
           return {
             id: item.product.id,
             titel: item.product.fieldData.name,
-            prijs: (item.skus[0]?.fieldData.prijs?.value || 0) / 100,
+            prijs: (item.skus[0]?.fieldData.price?.value || 0) / 100,
             omschrijving: item.product.fieldData.description,
+            inhoud: item.product.fieldData['long-description'] || "Geen uitgebreide beschrijving",
             category: categoryNames[item.product.fieldData.category] || "Onbekende categorie",
-            foto: skuData.mainImage?.url || skuData['main-image']?.url || "https://via.placeholder.com/150", 
+
+            foto: skuData.mainImage?.url || skuData['main-image']?.url || "https://via.placeholder.com/150",
+
           };
         })
       );
     }).catch(error => console.error('Error fetching products:', error));
-  }, []);
+  fetch('https://api.webflow.com/v2/sites/698c7fc6053edea54bf62f29/collections/69a34a68b2ce95d6ac926b3d/items', {
+    headers: { 
+      'Authorization': 'Bearer 0e32ebd2af532b8a16135c44039a81a15c7c702d731e058aaeac322ede2a7165',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then((res) => res.json())
+  .then(data => {
+    setBlogs(data.items.map(item => ({
+  id: item.id,
+  titel: item.fieldData.name,
+  omschrijving: item.fieldData['post-summary'] || "Lees meer over dit onderwerp...", 
+  inhoud: item.fieldData['post-body'] || item.fieldData.content, 
+  foto: item.fieldData['main-image']?.url
+})));
+  }).catch(error => console.error('Fout bij blogs:', error));
+}, []);
       
   const filteredProducts = products.filter((product) => {
     const productNaam = product.titel.toLowerCase();
@@ -120,18 +141,22 @@ const HomeScreen = ({ navigation }) => {
               prijs={product.prijs}
               foto={product.foto}
               omschrijving={product.omschrijving}
-              inhoud={product.inhoud}
+              inhoud={product.longDescription}
               onPress={() => navigation.navigate('ProductDetails', product)} 
             />
           ))}
         </View>
 
         <Text style={styles.header}>Blogposts</Text>
-        <BlogCard 
-          titel="Duurzaam Leven" 
-          foto="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500"
-          omschrijving="5 praktische tips om je huis groener te maken."
-        />
+        {blogs.map((blog) => (
+          <BlogCard
+            key={blog.id}
+            titel={blog.titel}
+            foto={blog.foto}
+            omschrijving={blog.omschrijving}
+            inhoud={blog.inhoud}
+          />
+        ))}
 
         <TouchableOpacity style={styles.customButton} onPress={() => alert('Winkelmandje geopend!')}>
           <Text style={styles.buttonText}>Winkelmandje Bekijken</Text>

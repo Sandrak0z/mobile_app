@@ -1,15 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+
+import { ScrollView, Image, Text, StyleSheet, useWindowDimensions, View } from 'react-native';
+import RenderHtml from 'react-native-render-html';
 
 const BlogDetails = ({ route }) => {
   const { titel, inhoud, foto } = route.params;
-
+  const { width } = useWindowDimensions(); 
   return (
     <ScrollView style={styles.container}>
-      {foto && <Image source={{ uri: foto }} style={styles.image} />}
+      <Image source={{ uri: foto }} style={styles.image} />
+      
       <View style={styles.content}>
         <Text style={styles.title}>{titel}</Text>
-        <Text style={styles.body}>{inhoud}</Text>
+
+        <RenderHtml
+          contentWidth={width}
+          source={{ html: inhoud }}
+          tagsStyles={{
+            p: { marginBottom: 10, fontSize: 16, lineHeight: 24, color: '#333' },
+            h2: { marginTop: 20, marginBottom: 10, fontSize: 22, fontWeight: 'bold', color: '#236b41' },
+            h3: { marginTop: 15, marginBottom: 8, fontSize: 18, fontWeight: 'bold' },
+            li: { fontSize: 16, marginBottom: 5 }
+          }}
+        />
       </View>
     </ScrollView>
   );
@@ -20,7 +33,6 @@ const styles = StyleSheet.create({
   image: { width: '100%', height: 250 },
   content: { padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 15, color: '#333' },
-  body: { fontSize: 16, lineHeight: 24, color: '#666' }
 });
 
 export default BlogDetails;
